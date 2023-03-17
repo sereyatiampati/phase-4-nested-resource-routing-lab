@@ -3,13 +3,8 @@ class ItemsController < ApplicationController
 
   def index
     if params[:user_id]
-      user=User.find_by(id: params[:user_id])
-      if user
-        render json: user.items
-      else
-        render json: {error: "user not found"}, status: :not_found
-      end
-      
+      user=User.find(params[:user_id])
+      render json: user.items
     else
       items = Item.all
       render json: items, include: :user
