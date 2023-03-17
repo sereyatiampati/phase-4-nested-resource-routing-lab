@@ -1,4 +1,5 @@
 class ItemsController < ApplicationController
+  rescue_from ActiveRecord::RecordNotFound, with: :render_not_found
 
   def index
     if params[:user_id]
@@ -16,13 +17,23 @@ class ItemsController < ApplicationController
   end
 
   def show
-    item=Item.find_by(id: params[:id])
-    if item
-      render json: item
-    else
-      render json: {error: "item not found"}, status: :not_found
-    end
+    item=Item.find(params[:id])
+    render json: item
     
+  end
+
+  def create
+    user=User.find(params[:user_id])
+    item=user.items.create(item_params)
+    render json: item, status: :created
+  end
+
+  private
+  def item_params
+    params.permit(:name, :description, :price)
+  end
+  def render_not_found
+    render json: { error: "item not found" }, status: :not_found
   end
 
 end
